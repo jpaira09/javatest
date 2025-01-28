@@ -76,8 +76,7 @@ jobs:
     - name: Add PR Comment with SonarQube results
       uses: actions/github-script@v6
       with:
-        script: |
-          #const qualityGateStatus = '${{ steps.sonar-quality-gate.outputs.result }}';
+        script: |         
           const prNumber = ${{ github.event.pull_request.number }};
           const prComment = `
             CI Checks completed for PR #${prNumber}:

@@ -36,6 +36,7 @@ jobs:
 
   # Dependency Check Job
   dependency-check:
+    needs: checkstyle
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -64,6 +65,7 @@ jobs:
 
   # Build Job
   build:
+    needs: dependency-check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -92,6 +94,7 @@ jobs:
 
   # Unit Tests Job
   unit-tests:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

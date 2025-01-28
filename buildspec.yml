@@ -1,0 +1,56 @@
+version: 0.2
+run-as: root
+
+env:
+  variables:
+    REGION: "us-west-2"
+    FUNCTION_NAME: "Technician-dev"
+    S3_BUCKET: "prsm-mw-artifacts"
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+    commands:
+      - echo Installing dependencies...
+      - curl -sL https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xz -C /opt
+      - export PATH=/opt/apache-maven-3.9.9/bin:$PATH
+      - mvn --version
+
+  pre_build:
+    commands:
+      - echo "Pre-build phase - Preparing to build Lambda"
+      - echo "Using Java version:"
+      - java -version
+      - echo "Using Maven version:"
+      - mvn -v
+
+  build:
+    commands:
+      - echo "Building the Lambda function zip"
+      - mvn clean package -DskipTests
+      - echo "Build completed."
+
+  post_build:
+    commands:
+      - echo "Post-build phase - Preparing to upload artifact to S3 and Lambda"
+      - TIMESTAMP=$(date +%Y%m%d%H%M%S)
+      - ARTIFACT_NAME="lambda-deployment-${TIMESTAMP}.zip"
+      - echo "Artifact Name - $ARTIFACT_NAME"
+      - mv target/*.zip /tmp/$ARTIFACT_NAME
+      - echo "Artifact moved to /tmp directory"
+      - aws s3 cp /tmp/$ARTIFACT_NAME s3://$S3_BUCKET/$ARTIFACT_NAME
+      - echo "Artifact uploaded to S3"
+      - echo "Updating Lambda function code"
+      - aws lambda update-function-code --function-name $FUNCTION_NAME --s3-bucket $S3_BUCKET --s3-key $ARTIFACT_NAME --region $REGION
+      - echo "Lambda function updated with new ZIP."
+
+
+artifacts:
+  files:
+    - '/tmp/*.zip'
+  discard-paths: yes
+
+cache:
+  paths:
+    - '/root/.m2/**/*'

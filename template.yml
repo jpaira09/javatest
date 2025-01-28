@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Serverless Spring Boot 2 API - org.dtna::aws-middleware
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  AwsMiddlewareFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: org.dtna.StreamLambdaHandler::handleRequest
+      Runtime: java21
+      CodeUri: .
+      MemorySize: 512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 30
+      Events:
+        ProxyResource:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+
+Outputs:
+  AwsMiddlewareApi:
+    Description: URL for application
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ping'
+    Export:
+      Name: AwsMiddlewareApi

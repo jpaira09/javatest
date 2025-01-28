@@ -84,7 +84,6 @@ jobs:
             - Dependency Check: ✅
             - Build: ✅
             - Unit Tests: ✅
-            #- SonarQube Quality Gate: ${qualityGateStatus === 'OK' ? '✅ Passed' : '❌ Failed'}
           `;
           const { data: comment } = await github.rest.issues.createComment({
             owner: context.repo.owner,

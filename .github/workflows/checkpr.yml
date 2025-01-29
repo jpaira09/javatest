@@ -32,6 +32,8 @@ jobs:
           echo "Running Checkstyle"
           # Simulate Checkstyle results
           echo "Checkstyle: ✅ Passed" >> $GITHUB_ENV
+          # Intentionally fail the step by using a non-zero exit code
+          exit 1
         continue-on-error: true  # This ensures the check doesn't stop if Checkstyle fails
 
   # Dependency Check Job

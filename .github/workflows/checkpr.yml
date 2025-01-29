@@ -39,6 +39,7 @@ jobs:
   # Dependency Check Job
   dependency-check:
     needs: checkstyle
+    if: always()  # Ensure it runs regardless of previous job status
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
